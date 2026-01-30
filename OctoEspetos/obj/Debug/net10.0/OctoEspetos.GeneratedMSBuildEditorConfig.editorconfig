@@ -34,6 +34,9 @@ build_property.EnableCodeStyleSeverity =
 [/home/felipefreitas/Development/Marchinner/OctoEspetos/OctoEspetos/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[/home/felipefreitas/Development/Marchinner/OctoEspetos/OctoEspetos/Views/InventoryView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [/home/felipefreitas/Development/Marchinner/OctoEspetos/OctoEspetos/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 

@@ -55,6 +55,14 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    public void NavigateToInventory()
+    {
+        var vm = new InventoryViewModel();
+        vm.RequestGoBack = () => GoToOrder();
+        CurrentView = vm;
+    }
+
+    [RelayCommand]
     public void Exit()
     {
         if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

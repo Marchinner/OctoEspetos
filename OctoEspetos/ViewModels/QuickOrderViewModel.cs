@@ -32,7 +32,14 @@ public partial class QuickOrderViewModel : ViewModelBase
     [ObservableProperty]
     private string _selectedPaymentMethod = "Dinheiro";
 
+    [ObservableProperty]
+    private ProductCategory? _selectedCategory;
+
+    private ObservableCollection<Product> _allProducts = [];
+
     public ObservableCollection<Product> Products { get; } = [];
+
+    public ObservableCollection<ProductCategory> Categories { get; } = [];
 
     public ObservableCollection<OrderItem> Cart { get; } = [];
 
@@ -52,17 +59,54 @@ public partial class QuickOrderViewModel : ViewModelBase
         LoadProducts();
     }
 
+    partial void OnSelectedCategoryChanged(ProductCategory? value)
+    {
+        FilterProducts();
+    }
+
+    [RelayCommand]
+    private void SelectCategory(ProductCategory? category)
+    {
+        SelectedCategory = category;
+    }
+
+    private void FilterProducts()
+    {
+        Products.Clear();
+
+        var filtered = SelectedCategory == null 
+            ? _allProducts 
+            : _allProducts.Where(p => p.CategoryId == SelectedCategory.Id);
+
+        foreach (var p in filtered)
+        {
+            Products.Add(p);
+        }
+    }
+
     private void LoadProducts()
     {
         using var db = new AppDbContext();
+        
+        // Carregar categorias
+        var categories = db.Categories.ToList();
+        Categories.Clear();
+        foreach (var c in categories) Categories.Add(c);
+
+        // Carregar produtos
         var all = db.Products
             .Include(p => p.Category)
             .Where(p => p.IsActive)
             .ToList();
 
+        _allProducts.Clear();
         Products.Clear();
 
-        foreach (var p in all) Products.Add(p);
+        foreach (var p in all)
+        {
+            _allProducts.Add(p);
+            Products.Add(p);
+        }
     }
 
     /// <summary>

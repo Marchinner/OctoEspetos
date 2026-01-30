@@ -1,0 +1,163 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:OctoEspetos.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
+             x:DataType="vm:InventoryViewModel"
+             x:Class="OctoEspetos.Views.InventoryView">
+    <Design.DataContext>
+        <vm:InventoryViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#252526" Padding="15">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <Button Content="← Voltar" 
+                        Command="{Binding GoBackCommand}"
+                        Background="Transparent" Foreground="#AAA"
+                        FontSize="16"/>
+                
+                <TextBlock Grid.Column="1" 
+                           Text="GERENCIAMENTO DE INVENTÁRIO" 
+                           FontSize="20" FontWeight="Bold" 
+                           Foreground="White"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                
+                <TextBlock Grid.Column="2" 
+                           Text="{Binding StatusMessage}" 
+                           Foreground="#4CC2FF" 
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Conteúdo Principal -->
+        <Grid Grid.Row="1" ColumnDefinitions="300, *">
+            
+            <!-- Painel de Categorias -->
+            <Border Grid.Column="0" Background="#1E1E1E" Padding="15">
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <TextBlock Text="CATEGORIAS" FontWeight="Bold" Foreground="#AAA" Margin="0,0,0,10"/>
+                    
+                    <ListBox Grid.Row="1" 
+                             ItemsSource="{Binding Categories}" 
+                             SelectedItem="{Binding SelectedCategory}"
+                             Background="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" 
+                                           Foreground="White" 
+                                           FontSize="14" 
+                                           Padding="8,6"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    
+                    <!-- Adicionar Categoria -->
+                    <StackPanel Grid.Row="2" Spacing="8" Margin="0,15,0,0">
+                        <TextBox Text="{Binding NewCategoryName}" 
+                                 Watermark="Nova categoria..."
+                                 Background="#333" Foreground="White"
+                                 CornerRadius="5" Padding="10,8"/>
+                        <Grid ColumnDefinitions="*, Auto">
+                            <Button Content="+ Adicionar" 
+                                    Command="{Binding AddCategoryCommand}"
+                                    Background="#4CC2FF" Foreground="White"
+                                    HorizontalAlignment="Stretch"
+                                    CornerRadius="5" Margin="0,0,5,0"/>
+                            <Button Grid.Column="1" Content="🗑" 
+                                    Command="{Binding DeleteCategoryCommand}"
+                                    Background="#FF6B6B" Foreground="White"
+                                    CornerRadius="5" Padding="10,8"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- Painel de Produtos -->
+            <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto" Background="#252526">
+                
+                <!-- Formulário de Novo Produto -->
+                <Border Grid.Row="0" Background="#333" Padding="15" Margin="15,15,15,0" CornerRadius="8">
+                    <Grid ColumnDefinitions="*, 150, Auto, Auto">
+                        <TextBox Text="{Binding NewProductName}" 
+                                 Watermark="Nome do produto..."
+                                 Background="#444" Foreground="White"
+                                 CornerRadius="5" Padding="10,8"
+                                 Margin="0,0,10,0"/>
+                        <TextBox Grid.Column="1" 
+                                 Text="{Binding NewProductPrice}" 
+                                 Watermark="Preço"
+                                 Background="#444" Foreground="White"
+                                 CornerRadius="5" Padding="10,8"
+                                 Margin="0,0,10,0"/>
+                        <ComboBox Grid.Column="2"
+                                  ItemsSource="{Binding Categories}"
+                                  SelectedItem="{Binding SelectedCategory}"
+                                  Width="150"
+                                  Background="#444"
+                                  Margin="0,0,10,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Grid.Column="3" Content="+ ADICIONAR PRODUTO" 
+                                Command="{Binding AddProductCommand}"
+                                Background="#28A745" Foreground="White"
+                                FontWeight="Bold"
+                                CornerRadius="5" Padding="15,8"/>
+                    </Grid>
+                </Border>
+                
+                <!-- Lista de Produtos -->
+                <DataGrid Grid.Row="1" 
+                          ItemsSource="{Binding Products}" 
+                          SelectedItem="{Binding SelectedProduct}"
+                          AutoGenerateColumns="False"
+                          Background="Transparent"
+                          Margin="15"
+                          CanUserReorderColumns="False"
+                          CanUserResizeColumns="True"
+                          GridLinesVisibility="Horizontal"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Nome" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="Preço" Binding="{Binding SellPrice, StringFormat='R$ {0:N2}'}" Width="120"/>
+                        <DataGridTextColumn Header="Categoria" Binding="{Binding Category.Name}" Width="150"/>
+                        <DataGridCheckBoxColumn Header="Ativo" Binding="{Binding IsActive}" Width="80"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                
+                <!-- Ações do Produto Selecionado -->
+                <Border Grid.Row="2" Background="#1E1E1E" Padding="15">
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                        <Button Content="✏️ EDITAR" 
+                                Command="{Binding EditProductCommand}"
+                                Background="#FF8C00" Foreground="White"
+                                FontWeight="Bold" Padding="20,10" CornerRadius="5"
+                                IsEnabled="{Binding SelectedProduct, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                        <Button Content="💾 SALVAR" 
+                                Command="{Binding SaveProductCommand}"
+                                Background="#28A745" Foreground="White"
+                                FontWeight="Bold" Padding="20,10" CornerRadius="5"
+                                IsVisible="{Binding IsEditingProduct}"/>
+                        <Button Content="❌ CANCELAR" 
+                                Command="{Binding CancelEditCommand}"
+                                Background="#666" Foreground="White"
+                                Padding="20,10" CornerRadius="5"
+                                IsVisible="{Binding IsEditingProduct}"/>
+                        <Button Content="🗑️ EXCLUIR" 
+                                Command="{Binding DeleteProductCommand}"
+                                Background="#DC3545" Foreground="White"
+                                FontWeight="Bold" Padding="20,10" CornerRadius="5"
+                                IsEnabled="{Binding SelectedProduct, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

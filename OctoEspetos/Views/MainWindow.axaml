@@ -50,7 +50,8 @@
                     <Button Classes="NavBtn" Content="Dashboard / Histórico" 
                             Command="{Binding NavigateToDashboardCommand}"/>
                     
-                    <Button Classes="NavBtn" Content="Inventário" IsEnabled="False"/> </StackPanel>
+                    <Button Classes="NavBtn" Content="Inventário" 
+                            Command="{Binding NavigateToInventoryCommand}"/> </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
                     <TextBlock Text="Caixa 01" VerticalAlignment="Center" Foreground="#666" Margin="0,0,15,0" FontSize="12"/>
