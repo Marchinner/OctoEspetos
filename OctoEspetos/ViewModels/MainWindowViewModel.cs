@@ -2,6 +2,7 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using OctoEspetos.Models;
 
 namespace OctoEspetos.ViewModels;
 
@@ -13,22 +14,22 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        // Start the app on the QuickOrder screen (or your Home screen)
+        // Start the app on the QuickOrder screen
         CurrentView = new QuickOrderViewModel();
     }
 
-    // Method to navigate (You can bind buttons to this)
     [RelayCommand]
     public void GoToHome()
     {
-        // CurrentView = new HomeViewModel(); // Assuming you create a HomeViewModel later
+        // CurrentView = new HomeViewModel();
     }
 
     [RelayCommand]
     public void NavigateToDashboard()
     {
         var vm = new OrdersDashboardViewModel();
-        vm.RequestGoBack = () => GoToOrder(); // Define the "Back" action
+        vm.RequestGoBack = () => GoToOrder();
+        vm.RequestEditOrder = (order) => EditOrder(order);
         CurrentView = vm;
     }
 
@@ -37,28 +38,32 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var orderVm = new QuickOrderViewModel();
 
-        // When order is done, go back to Home (or refresh)
         orderVm.OnFinished = () =>
         {
-            // GoToHome(); // Switch view back
-            // For now, just reset the order screen:
             GoToOrder();
         };
 
         CurrentView = orderVm;
     }
 
+    public void EditOrder(Order order)
+    {
+        var orderVm = new QuickOrderViewModel();
+        orderVm.LoadOrder(order);
+        orderVm.OnFinished = () => NavigateToDashboard();
+        CurrentView = orderVm;
+    }
+
     [RelayCommand]
-        public void Exit()
+    public void Exit()
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Clean way to close Avalonia App
-            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.Shutdown();
-            }
-            else
-            {
-                Environment.Exit(0);
-            }
+            desktop.Shutdown();
         }
+        else
+        {
+            Environment.Exit(0);
+        }
+    }
 }

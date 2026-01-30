@@ -16,40 +16,81 @@
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <TextBlock Text="Cliente:" VerticalAlignment="Center" Foreground="#AAA" FontSize="18"/>
                 
-                <Border Background="#333" CornerRadius="5" Padding="10,5">
-                    <TextBlock Text="{Binding SelectedClient.Name}" 
-                               FontWeight="Bold" Foreground="White" FontSize="18"/>
-                </Border>
-                
-                <Button Content="Alterar Cliente" Background="#444" Foreground="White"/>
+                <TextBox Text="{Binding ClientName}" 
+                         Width="300"
+                         FontWeight="Bold" FontSize="18"
+                         Background="#333" Foreground="White"
+                         BorderThickness="0" Padding="10,8"
+                         CornerRadius="5"
+                         Watermark="Nome do cliente..."/>
                 
                 <TextBlock Text="{Binding StatusMessage}" 
                            Foreground="#4CC2FF" VerticalAlignment="Center" Margin="20,0,0,0" FontWeight="Bold"/>
             </StackPanel>
         </Border>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, 400">
+        <Grid Grid.Row="1" ColumnDefinitions="*, 420">
             
-            <ScrollViewer Grid.Column="0" Padding="10">
+            <!-- Área de Produtos -->
+            <ScrollViewer Grid.Column="0" Padding="15" HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding Products}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel ItemWidth="160" ItemHeight="160"/>
+                            <UniformGrid Columns="5"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Margin="5" 
+                            <Button Margin="6" Padding="0"
                                     Command="{Binding $parent[UserControl].DataContext.AddToCartCommand}"
                                     CommandParameter="{Binding}"
-                                    Background="#3E3E42" CornerRadius="8"
-                                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                                <Grid RowDefinitions="*, Auto">
-                                    <TextBlock Grid.Row="0" Text="{Binding Name}" 
-                                               TextWrapping="Wrap" FontSize="16" FontWeight="Bold"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Row="1" Text="{Binding SellPrice, StringFormat='R$ {0:N2}'}" 
-                                               Foreground="#9CDCFE" HorizontalAlignment="Right" FontSize="14"/>
+                                    Background="#2D2D30" 
+                                    CornerRadius="10"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Top"
+                                    HorizontalContentAlignment="Stretch" 
+                                    VerticalContentAlignment="Stretch"
+                                    BorderBrush="#3E3E42"
+                                    BorderThickness="1"
+                                    Height="180">
+                                <Grid RowDefinitions="90, *, 40">
+                                    <!-- Área para Imagem -->
+                                    <Border Grid.Row="0" 
+                                            Background="#3E3E42" 
+                                            CornerRadius="10,10,0,0">
+                                        <TextBlock Text="🍢" 
+                                                   FontSize="36" 
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"
+                                                   Opacity="0.4"/>
+                                    </Border>
+                                    
+                                    <!-- Nome do Produto -->
+                                    <Border Grid.Row="1" Padding="8,6">
+                                        <TextBlock Text="{Binding Name}" 
+                                                   TextWrapping="Wrap" 
+                                                   TextTrimming="CharacterEllipsis"
+                                                   MaxLines="2"
+                                                   FontSize="13" 
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White"
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"
+                                                   TextAlignment="Center"/>
+                                    </Border>
+                                    
+                                    <!-- Preço -->
+                                    <Border Grid.Row="2" 
+                                            Background="#1E1E1E" 
+                                            CornerRadius="0,0,10,10"
+                                            Padding="8,0">
+                                        <TextBlock Text="{Binding SellPrice, StringFormat='R$ {0:N2}'}" 
+                                                   Foreground="#4CC2FF" 
+                                                   FontWeight="Bold"
+                                                   FontSize="15"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
                                 </Grid>
                             </Button>
                         </DataTemplate>
@@ -57,19 +98,28 @@
                 </ItemsControl>
             </ScrollViewer>
 
+            <!-- Painel do Pedido -->
             <Border Grid.Column="1" Background="#1E1E1E" BorderBrush="#333" BorderThickness="1,0,0,0">
                 <Grid RowDefinitions="Auto, *, Auto">
-                    <TextBlock Text="PEDIDO ATUAL" Foreground="#AAA" Margin="15" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal" Margin="15">
+                        <TextBlock Text="PEDIDO ATUAL" Foreground="#AAA" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Text="{Binding EditingOrderId, StringFormat=' (Editando #{0})'}" 
+                                   Foreground="#FFA500" FontWeight="SemiBold"
+                                   IsVisible="{Binding EditingOrderId, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    </StackPanel>
                     
-                    <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent">
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent" Margin="10,0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid ColumnDefinitions="30, *, Auto, 30">
-                                    <TextBlock Text="{Binding Quantity}" Foreground="#4CC2FF" VerticalAlignment="Center"/>
+                                <Grid ColumnDefinitions="35, *, Auto, 35" Margin="0,2">
+                                    <Border Background="#4CC2FF" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Quantity}" Foreground="White" FontWeight="Bold"/>
+                                    </Border>
                                     <TextBlock Grid.Column="1" Text="{Binding Product.Name}" VerticalAlignment="Center" Margin="10,0"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding UnitPrice, StringFormat='{}{0:N2}'}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding UnitPrice, StringFormat='R$ {0:N2}'}" VerticalAlignment="Center" Foreground="#9CDCFE"/>
                                     
-                                    <Button Grid.Column="3" Content="X" Foreground="Red" Background="Transparent"
+                                    <Button Grid.Column="3" Content="✕" Foreground="#FF6B6B" Background="Transparent"
+                                            FontSize="12"
                                             Command="{Binding $parent[UserControl].DataContext.RemoveFromCartCommand}"
                                             CommandParameter="{Binding}"/>
                                 </Grid>
@@ -77,17 +127,32 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <StackPanel Grid.Row="2" Background="#252526" Spacing="10">
+                    <StackPanel Grid.Row="2" Background="#252526" Spacing="12" Margin="15">
+                        <!-- Total -->
                         <Grid ColumnDefinitions="*, Auto">
-                            <TextBlock Text="TOTAL" FontSize="20" Foreground="#AAA"/>
+                            <TextBlock Text="TOTAL" FontSize="18" Foreground="#AAA" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='R$ {0:N2}'}" 
                                        FontSize="32" FontWeight="Bold" Foreground="#4CC2FF"/>
                         </Grid>
                         
-                        <Button Content="PAGAR / FINALIZAR (F2)" 
-                                Command="{Binding CheckoutCommand}"
-                                Background="#28A745" Foreground="White" FontSize="20" FontWeight="Bold"
-                                HorizontalAlignment="Stretch" Height="60" CornerRadius="5"/>
+                        <!-- Botões empilhados -->
+                        <StackPanel Spacing="8">
+                            <Button Content="💾  DEIXAR EM ABERTO (F3)" 
+                                    Command="{Binding SaveOpenOrderCommand}"
+                                    Background="#FF8C00" Foreground="White" 
+                                    FontSize="15" FontWeight="Bold"
+                                    HorizontalAlignment="Stretch" 
+                                    HorizontalContentAlignment="Center"
+                                    Height="50" CornerRadius="8"/>
+                            
+                            <Button Content="💰  PAGAR / FINALIZAR (F2)" 
+                                    Command="{Binding CheckoutCommand}"
+                                    Background="#28A745" Foreground="White" 
+                                    FontSize="15" FontWeight="Bold"
+                                    HorizontalAlignment="Stretch" 
+                                    HorizontalContentAlignment="Center"
+                                    Height="50" CornerRadius="8"/>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </Border>

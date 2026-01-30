@@ -58,7 +58,7 @@
               <DataGridTextColumn Width="60" Binding="{Binding Id}" Header="#" />
               <DataGridTextColumn Width="80"
                                   Binding="{Binding CreatedAt, StringFormat='HH:mm'}"
-                                  Header="Horário" />
+                                  Header="Hora" />
               <DataGridTextColumn Width="*"
                                   Binding="{Binding Client.Name}"
                                   Header="Cliente" />
@@ -84,24 +84,42 @@
                         Background="#3E3E42"
                         CornerRadius="5"
                         Padding="10">
-                  <Grid RowDefinitions="Auto, *, Auto">
+                  <Grid RowDefinitions="Auto, *, Auto, Auto">
                     <TextBlock FontSize="16"
                                FontWeight="Bold"
                                Text="{Binding Client.Name, TargetNullValue='Walk-in'}" />
-                    <TextBlock Margin="0,5"
-                               Foreground="#AAA"
-                               Text="{Binding Id, StringFormat='Order #{0}'}"
-                               Grid.Row="1" />
-                    <DockPanel LastChildFill="False" Grid.Row="2">
-                      <TextBlock VerticalAlignment="Center"
-                                 FontWeight="Bold"
-                                 Foreground="#FF5555"
-                                 Text="{Binding TotalAmount, StringFormat='R$ {0:N2}'}"
-                                 DockPanel.Dock="Left" />
-                      <Button Content="PAGAR"
+                    <StackPanel Grid.Row="1" Margin="0,5">
+                      <TextBlock Foreground="#AAA"
+                                 Text="{Binding Id, StringFormat='Pedido #{0}'}" />
+                      <TextBlock Foreground="#888" FontSize="12"
+                                 Text="{Binding CreatedAt, StringFormat='Aberto: {0:HH:mm}'}" />
+                    </StackPanel>
+                    <TextBlock Grid.Row="2"
+                               Margin="0,5"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#4CC2FF"
+                               Text="{Binding TotalAmount, StringFormat='R$ {0:N2}'}" />
+                    <Grid Grid.Row="3" ColumnDefinitions="*, *">
+                      <Button Grid.Column="0"
+                              Content="EDITAR"
+                              Background="#007ACC"
+                              Foreground="White"
+                              FontWeight="Bold"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,0,3,0"
+                              Command="{Binding $parent[UserControl].DataContext.EditOrderCommand}"
+                              CommandParameter="{Binding}" />
+                      <Button Grid.Column="1"
+                              Content="PAGAR"
                               Background="#28a745"
-                              DockPanel.Dock="Right" />
-                    </DockPanel>
+                              Foreground="White"
+                              FontWeight="Bold"
+                              HorizontalAlignment="Stretch"
+                              Margin="3,0,0,0"
+                              Command="{Binding $parent[UserControl].DataContext.PayOrderCommand}"
+                              CommandParameter="{Binding}" />
+                    </Grid>
                   </Grid>
                 </Border>
               </DataTemplate>

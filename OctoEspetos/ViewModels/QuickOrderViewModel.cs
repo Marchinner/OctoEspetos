@@ -17,10 +17,17 @@ public partial class QuickOrderViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CheckoutCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SaveOpenOrderCommand))]
     private decimal _totalAmount;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _clientName = "Consumidor Final";
+
+    [ObservableProperty]
+    private int? _editingOrderId;
 
     public ObservableCollection<Product> Products { get; } = [];
 
@@ -31,8 +38,6 @@ public partial class QuickOrderViewModel : ViewModelBase
     public QuickOrderViewModel()
     {
         SelectedClient = new Client { Name = "Consumidor Final" };
-
-
         LoadProducts();
     }
 
@@ -47,6 +52,40 @@ public partial class QuickOrderViewModel : ViewModelBase
         Products.Clear();
 
         foreach (var p in all) Products.Add(p);
+    }
+
+    /// <summary>
+    /// Carrega um pedido existente para edição
+    /// </summary>
+    public void LoadOrder(Order order)
+    {
+        EditingOrderId = order.Id;
+        ClientName = order.Client?.Name ?? "Consumidor Final";
+        SelectedClient = order.Client ?? new Client { Name = ClientName };
+
+        Cart.Clear();
+
+        using var db = new AppDbContext();
+        var items = db.OrderItems
+            .Include(i => i.Product)
+            .Where(i => i.OrderId == order.Id)
+            .ToList();
+
+        foreach (var item in items)
+        {
+            Cart.Add(new OrderItem
+            {
+                Id = item.Id,
+                ProductId = item.ProductId,
+                Product = item.Product,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice,
+                OrderId = item.OrderId
+            });
+        }
+
+        RecalculateTotal();
+        StatusMessage = $"Editando Pedido #{order.Id}";
     }
 
     [RelayCommand]
@@ -82,6 +121,91 @@ public partial class QuickOrderViewModel : ViewModelBase
         TotalAmount = Cart.Sum(x => x.Quantity * x.UnitPrice);
     }
 
+    private bool CanSaveOrder() => TotalAmount > 0;
+
+    [RelayCommand(CanExecute = nameof(CanSaveOrder))]
+    private async Task SaveOpenOrderAsync()
+    {
+        StatusMessage = "Salvando pedido...";
+
+        using var db = new AppDbContext();
+        using var transaction = db.Database.BeginTransaction();
+
+        try
+        {
+            Order order;
+
+            if (EditingOrderId.HasValue)
+            {
+                // Atualizando pedido existente
+                order = await db.Orders
+                    .Include(o => o.Client)
+                    .FirstOrDefaultAsync(o => o.Id == EditingOrderId.Value)
+                    ?? throw new Exception("Pedido não encontrado");
+
+                // Remover itens antigos
+                var oldItems = db.OrderItems.Where(i => i.OrderId == order.Id);
+                db.OrderItems.RemoveRange(oldItems);
+
+                // Atualizar cliente se nome mudou
+                if (order.Client != null && order.Client.Name != ClientName)
+                {
+                    order.Client.Name = ClientName;
+                }
+
+                order.TotalAmount = TotalAmount;
+            }
+            else
+            {
+                // Criando novo pedido
+                var client = new Client { Id = Guid.NewGuid(), Name = ClientName };
+                order = new Order
+                {
+                    CreatedAt = DateTime.Now,
+                    TotalAmount = TotalAmount,
+                    IsPaid = false,
+                    Client = client,
+                    ClientId = client.Id
+                };
+                db.Orders.Add(order);
+                await db.SaveChangesAsync();
+            }
+
+            // Adicionar itens
+            foreach (var item in Cart)
+            {
+                var orderItem = new OrderItem
+                {
+                    OrderId = order.Id,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice
+                };
+                db.OrderItems.Add(orderItem);
+            }
+
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            var action = EditingOrderId.HasValue ? "Atualizado" : "Aberto";
+            StatusMessage = $"Pedido #{order.Id} {action}!";
+
+            // Reset UI
+            Cart.Clear();
+            RecalculateTotal();
+            ClientName = "Consumidor Final";
+            EditingOrderId = null;
+
+            await Task.Delay(1000);
+            OnFinished?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = "Erro: " + ex.Message;
+            await transaction.RollbackAsync();
+        }
+    }
+
     [RelayCommand]
     private async Task CheckoutAsync()
     {
@@ -93,59 +217,85 @@ public partial class QuickOrderViewModel : ViewModelBase
             {
                 try
                 {
-                    var client = SelectedClient.Id == Guid.Empty ? new(){Id = Guid.NewGuid(), Name = "Consumidor Final"} : SelectedClient;
-                    // 1. Create the Order
-                    var order = new Order
+                    Order order;
+
+                    if (EditingOrderId.HasValue)
                     {
-                        CreatedAt = DateTime.Now,
-                        TotalAmount = TotalAmount,
-                        IsPaid = true, // Immediate payment
+                        // Finalizando pedido existente
+                        order = await db.Orders
+                            .Include(o => o.Client)
+                            .FirstOrDefaultAsync(o => o.Id == EditingOrderId.Value)
+                            ?? throw new Exception("Pedido não encontrado");
 
-                        // If client exists in DB, attach ID. If new, let EF create it.
-                        Client = client,
-                        ClientId = client.Id
-                    };
+                        // Remover itens antigos
+                        var oldItems = db.OrderItems.Where(i => i.OrderId == order.Id);
+                        db.OrderItems.RemoveRange(oldItems);
 
-                    db.Orders.Add(order);
-                    await db.SaveChangesAsync();
+                        order.TotalAmount = TotalAmount;
+                        order.IsPaid = true;
 
-                    // 2. Add Items
-                    foreach (var item in Cart)
+                        if (order.Client != null && order.Client.Name != ClientName)
+                        {
+                            order.Client.Name = ClientName;
+                        }
+
+                        await db.SaveChangesAsync();
+                    }
+                    else
                     {
-                        item.OrderId = order.Id;
-                        item.Product = null; // Prevent EF from trying to re-add the Product
-                        db.OrderItems.Add(item);
+                        var client = new Client { Id = Guid.NewGuid(), Name = ClientName };
+                        order = new Order
+                        {
+                            CreatedAt = DateTime.Now,
+                            TotalAmount = TotalAmount,
+                            IsPaid = true,
+                            Client = client,
+                            ClientId = client.Id
+                        };
+
+                        db.Orders.Add(order);
+                        await db.SaveChangesAsync();
                     }
 
-                    // 3. Register Payment (Simplified for this view)
-                    var payment = new Payment // Assuming you have a Payment entity
+                    // Adicionar itens
+                    foreach (var item in Cart)
+                    {
+                        var orderItem = new OrderItem
+                        {
+                            OrderId = order.Id,
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity,
+                            UnitPrice = item.UnitPrice
+                        };
+                        db.OrderItems.Add(orderItem);
+                    }
+
+                    // Registrar pagamento
+                    var payment = new Payment
                     {
                         OrderId = order.Id,
                         Amount = TotalAmount,
-                        PaymentMethod = "Dinheiro", // In real app, bind this to UI selection
+                        PaymentMethod = "Dinheiro",
                         PaidAt = DateTime.Now
                     };
-                    db.Payments.Add(payment); // Uncomment if Payment table exists
+                    db.Payments.Add(payment);
 
                     await db.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    // 4. Reset UI
                     Cart.Clear();
                     RecalculateTotal();
                     StatusMessage = $"Pedido #{order.Id} Finalizado!";
-
-                    // Optional: Reset client to default walk-in
-                    SelectedClient = new Client { Name = "Consumidor Final" };
+                    ClientName = "Consumidor Final";
+                    EditingOrderId = null;
 
                     await Task.Delay(1000);
-
                     OnFinished?.Invoke();
                 }
                 catch (Exception ex)
                 {
-                    StatusMessage = "Error: " + ex.Message + "\n" + ex.InnerException?.Message;
-                    transaction.Rollback();
+                    StatusMessage = "Erro: " + ex.Message + "\n" + ex.InnerException?.Message;
+                    await transaction.RollbackAsync();
                 }
             }
         }
