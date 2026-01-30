@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:OctoEspetos.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
+             x:DataType="vm:QuickOrderViewModel"
+             x:Class="OctoEspetos.Views.QuickOrderView">
+  <Design.DataContext>
+        <vm:QuickOrderViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <Border Grid.Row="0" Background="#252526" Padding="15">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Cliente:" VerticalAlignment="Center" Foreground="#AAA" FontSize="18"/>
+                
+                <Border Background="#333" CornerRadius="5" Padding="10,5">
+                    <TextBlock Text="{Binding SelectedClient.Name}" 
+                               FontWeight="Bold" Foreground="White" FontSize="18"/>
+                </Border>
+                
+                <Button Content="Alterar Cliente" Background="#444" Foreground="White"/>
+                
+                <TextBlock Text="{Binding StatusMessage}" 
+                           Foreground="#4CC2FF" VerticalAlignment="Center" Margin="20,0,0,0" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*, 400">
+            
+            <ScrollViewer Grid.Column="0" Padding="10">
+                <ItemsControl ItemsSource="{Binding Products}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel ItemWidth="160" ItemHeight="160"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Margin="5" 
+                                    Command="{Binding $parent[UserControl].DataContext.AddToCartCommand}"
+                                    CommandParameter="{Binding}"
+                                    Background="#3E3E42" CornerRadius="8"
+                                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                                <Grid RowDefinitions="*, Auto">
+                                    <TextBlock Grid.Row="0" Text="{Binding Name}" 
+                                               TextWrapping="Wrap" FontSize="16" FontWeight="Bold"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding SellPrice, StringFormat='R$ {0:N2}'}" 
+                                               Foreground="#9CDCFE" HorizontalAlignment="Right" FontSize="14"/>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <Border Grid.Column="1" Background="#1E1E1E" BorderBrush="#333" BorderThickness="1,0,0,0">
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <TextBlock Text="PEDIDO ATUAL" Foreground="#AAA" Margin="15" FontWeight="SemiBold"/>
+                    
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="30, *, Auto, 30">
+                                    <TextBlock Text="{Binding Quantity}" Foreground="#4CC2FF" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Product.Name}" VerticalAlignment="Center" Margin="10,0"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding UnitPrice, StringFormat='{}{0:N2}'}" VerticalAlignment="Center"/>
+                                    
+                                    <Button Grid.Column="3" Content="X" Foreground="Red" Background="Transparent"
+                                            Command="{Binding $parent[UserControl].DataContext.RemoveFromCartCommand}"
+                                            CommandParameter="{Binding}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="2" Background="#252526" Spacing="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Text="TOTAL" FontSize="20" Foreground="#AAA"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='R$ {0:N2}'}" 
+                                       FontSize="32" FontWeight="Bold" Foreground="#4CC2FF"/>
+                        </Grid>
+                        
+                        <Button Content="PAGAR / FINALIZAR (F2)" 
+                                Command="{Binding CheckoutCommand}"
+                                Background="#28A745" Foreground="White" FontSize="20" FontWeight="Bold"
+                                HorizontalAlignment="Stretch" Height="60" CornerRadius="5"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

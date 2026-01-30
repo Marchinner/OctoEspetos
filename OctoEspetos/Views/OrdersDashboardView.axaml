@@ -1,0 +1,114 @@
+<UserControl x:Class="OctoEspetos.Views.OrdersDashboardView"
+             x:DataType="vm:OrdersDashboardViewModel"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:OctoEspetos.ViewModels"
+             d:DesignHeight="720"
+             d:DesignWidth="1280"
+             mc:Ignorable="d">
+  <Design.DataContext>
+    <vm:OrdersDashboardViewModel />
+  </Design.DataContext>
+  <Grid RowDefinitions="Auto, *">
+    <Border Background="#252526" Padding="15" Grid.Row="0">
+      <Grid ColumnDefinitions="Auto, *, Auto, Auto">
+        <Button Content="⬅ VOLTAR AO PDV"
+                Command="{Binding GoBackCommand}"
+                Background="Transparent"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                Grid.Column="0" />
+        <StackPanel VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    Grid.Column="2">
+          <TextBlock VerticalAlignment="Center"
+                     Foreground="#AAA"
+                     Text="FATURAMENTO TOTAL:" />
+          <TextBlock FontSize="24"
+                     FontWeight="Bold"
+                     Foreground="#4CC2FF"
+                     Text="{Binding TotalRevenueToday, StringFormat='R$ {0:N2}'}" />
+        </StackPanel>
+        <Button Content="⟳ Atualizar"
+                Command="{Binding LoadDataCommand}"
+                Margin="10,0,0,0"
+                Grid.Column="3" />
+      </Grid>
+    </Border>
+    <TabControl Margin="10" Grid.Row="1">
+      <TabItem Header="HISTÓRICO DE VENDAS">
+        <Grid RowDefinitions="Auto, *">
+          <StackPanel Margin="0,0,0,10"
+                      Orientation="Horizontal"
+                      Spacing="10">
+            <TextBlock VerticalAlignment="Center" Text="Date:" />
+            <DatePicker SelectedDate="{Binding SelectedDate}" />
+            <Button Content="Filtrar" Command="{Binding LoadDataCommand}" />
+          </StackPanel>
+          <DataGrid AutoGenerateColumns="False"
+                    Background="#2D2D30"
+                    GridLinesVisibility="Horizontal"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding FinishedOrders}"
+                    Grid.Row="1">
+            <DataGrid.Columns>
+              <DataGridTextColumn Width="60" Binding="{Binding Id}" Header="#" />
+              <DataGridTextColumn Width="80"
+                                  Binding="{Binding CreatedAt, StringFormat='HH:mm'}"
+                                  Header="Horário" />
+              <DataGridTextColumn Width="*"
+                                  Binding="{Binding Client.Name}"
+                                  Header="Cliente" />
+              <DataGridTextColumn Width="100"
+                                  Binding="{Binding TotalAmount, StringFormat='R$ {0:N2}'}"
+                                  FontWeight="Bold"
+                                  Header="Total" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </Grid>
+      </TabItem>
+      <TabItem Header="PEDIDOS ABERTOS / MESAS">
+        <ScrollViewer>
+          <ItemsControl ItemsSource="{Binding OpenOrders}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel ItemHeight="150" ItemWidth="220" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="5"
+                        Background="#3E3E42"
+                        CornerRadius="5"
+                        Padding="10">
+                  <Grid RowDefinitions="Auto, *, Auto">
+                    <TextBlock FontSize="16"
+                               FontWeight="Bold"
+                               Text="{Binding Client.Name, TargetNullValue='Walk-in'}" />
+                    <TextBlock Margin="0,5"
+                               Foreground="#AAA"
+                               Text="{Binding Id, StringFormat='Order #{0}'}"
+                               Grid.Row="1" />
+                    <DockPanel LastChildFill="False" Grid.Row="2">
+                      <TextBlock VerticalAlignment="Center"
+                                 FontWeight="Bold"
+                                 Foreground="#FF5555"
+                                 Text="{Binding TotalAmount, StringFormat='R$ {0:N2}'}"
+                                 DockPanel.Dock="Left" />
+                      <Button Content="PAGAR"
+                              Background="#28a745"
+                              DockPanel.Dock="Right" />
+                    </DockPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</UserControl>
