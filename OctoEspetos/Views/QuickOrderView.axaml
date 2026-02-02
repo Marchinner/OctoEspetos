@@ -31,10 +31,10 @@
             </StackPanel>
         </Border>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, 340">
+        <Grid x:Name="ContentGrid" Grid.Row="1" ColumnDefinitions="*, 300">
             
             <!-- Área de Produtos -->
-            <Grid Grid.Column="0" RowDefinitions="Auto, *">
+            <Grid x:Name="ProductArea" Grid.Column="0" RowDefinitions="Auto, *">
                 
                 <!-- Barra de Categorias -->
                 <ScrollViewer Grid.Row="0" 
@@ -75,13 +75,13 @@
                         </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
-
+ 
                 <!-- Produtos -->
                 <ScrollViewer Grid.Row="1" Padding="15" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Products}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel ItemWidth="190" ItemHeight="190" />
+                                <WrapPanel ItemWidth="155" ItemHeight="170" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -97,26 +97,26 @@
                                     VerticalContentAlignment="Stretch"
                                     BorderBrush="#3E3E42"
                                     BorderThickness="1"
-                                    Height="180">
-                                <Grid RowDefinitions="90, *, 40">
+                                    Height="160">
+                                <Grid RowDefinitions="80, *, 35">
                                     <!-- Área para Imagem -->
                                     <Border Grid.Row="0" 
                                             Background="#3E3E42" 
                                             CornerRadius="10,10,0,0">
                                         <TextBlock Text="🍢" 
-                                                   FontSize="36" 
+                                                   FontSize="32" 
                                                    HorizontalAlignment="Center" 
                                                    VerticalAlignment="Center"
                                                    Opacity="0.4"/>
                                     </Border>
                                     
                                     <!-- Nome do Produto -->
-                                    <Border Grid.Row="1" Padding="8,6">
+                                    <Border Grid.Row="1" Padding="6,4">
                                         <TextBlock Text="{Binding Name}" 
                                                    TextWrapping="Wrap" 
                                                    TextTrimming="CharacterEllipsis"
                                                    MaxLines="2"
-                                                   FontSize="14" 
+                                                   FontSize="13" 
                                                    FontWeight="SemiBold"
                                                    Foreground="White"
                                                    HorizontalAlignment="Center" 
@@ -132,7 +132,7 @@
                                         <TextBlock Text="{Binding SellPrice, StringFormat='R$ {0:N2}'}" 
                                                    Foreground="#4CC2FF" 
                                                    FontWeight="Bold"
-                                                   FontSize="16"
+                                                   FontSize="15"
                                                    HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"/>
                                     </Border>
@@ -145,74 +145,82 @@
             </Grid>
 
             <!-- Painel do Pedido -->
-            <Border Grid.Column="1" Background="#1E1E1E" BorderBrush="#333" BorderThickness="1,0,0,0">
+            <Border x:Name="CartArea" Grid.Column="1" Background="#1E1E1E" BorderBrush="#333" BorderThickness="1,0,0,0">
                 <Grid RowDefinitions="Auto, *, Auto">
-                    <StackPanel Orientation="Horizontal" Margin="15">
-                        <TextBlock Text="PEDIDO ATUAL" Foreground="#AAA" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text="{Binding EditingOrderId, StringFormat=' (Editando #{0})'}" 
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="PEDIDO" Foreground="#AAA" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text="{Binding EditingOrderId, StringFormat=' #{0}'}" 
                                    Foreground="#FFA500" FontWeight="SemiBold"
                                    IsVisible="{Binding EditingOrderId, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                     </StackPanel>
                     
-                    <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent" Margin="10,0">
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent" Margin="5,0">
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="m:OrderItem">
-                                <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="0,4">
-                                    <!-- Controle de Quantidade -->
-                                    <Border Background="#2D2D30" CornerRadius="6" Padding="4,2">
-                                        <StackPanel Orientation="Horizontal" Spacing="4">
-                                            <Button Content="−" 
-                                                    Width="48" Height="48"
-                                                    FontSize="20" FontWeight="Bold"
-                                                    Background="#555" Foreground="White"
-                                                    CornerRadius="4"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
-                                                    Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).DecrementQuantityCommand}"
-                                                    CommandParameter="{Binding}"/>
-                                            <TextBlock Text="{Binding Quantity}" 
-                                                       Width="30"
-                                                       Foreground="#4CC2FF" 
-                                                       FontWeight="Bold" 
-                                                       FontSize="18"
-                                                       TextAlignment="Center"
-                                                       VerticalAlignment="Center"/>
-                                            <Button Content="+" 
-                                                    Width="48" Height="48"
-                                                    FontSize="20" FontWeight="Bold"
-                                                    Background="#4CC2FF" Foreground="White"
-                                                    CornerRadius="4"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
-                                                    Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).IncrementQuantityCommand}"
-                                                    CommandParameter="{Binding}"/>
-                                        </StackPanel>
-                                    </Border>
-                                    
-                                    <!-- Nome do Produto -->
-                                    <TextBlock Grid.Column="1" 
-                                               Text="{Binding Product.Name}" 
-                                               VerticalAlignment="Center" 
-                                               Margin="12,0"
-                                               TextTrimming="CharacterEllipsis"/>
-                                    
-                                    <!-- Preço -->
-                                    <TextBlock Grid.Column="2" 
-                                               Text="{Binding UnitPrice, StringFormat='R$ {0:N2}'}" 
-                                               VerticalAlignment="Center" 
-                                               Foreground="#9CDCFE"
-                                               FontWeight="SemiBold"/>
-                                    
-                                    <!-- Remover -->
-                                    <Button Grid.Column="3" 
-                                            Content="✕" 
-                                            Foreground="#FF6B6B" 
-                                            Background="Transparent"
-                                            FontSize="14"
-                                            Margin="8,0,0,0"
-                                            Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).RemoveFromCartCommand}"
-                                            CommandParameter="{Binding}"/>
-                                </Grid>
+                                <Border Background="#2D2D30" CornerRadius="6" Padding="8" Margin="0,4">
+                                    <StackPanel Spacing="6">
+                                        <!-- Nome do Produto (Linha 1) -->
+                                        <TextBlock Text="{Binding Product.Name}" 
+                                                   Foreground="White"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="14"/>
+
+                                        <!-- Controles (Linha 2) -->
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <!-- Preço -->
+                                            <TextBlock Text="{Binding UnitPrice, StringFormat='R$ {0:N2}'}" 
+                                                       VerticalAlignment="Center" 
+                                                       Foreground="#9CDCFE"
+                                                       FontSize="13"
+                                                       FontWeight="Bold"/>
+
+                                            <!-- Quantidade e Botões -->
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="0">
+                                                <Button Content="−" 
+                                                        Width="40" Height="40"
+                                                        FontSize="18" FontWeight="Bold"
+                                                        Background="#444" Foreground="White"
+                                                        CornerRadius="4,0,0,4"
+                                                        HorizontalContentAlignment="Center"
+                                                        VerticalContentAlignment="Center"
+                                                        Padding="0"
+                                                        Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).DecrementQuantityCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                                
+                                                <Border Background="#333" Width="30" Height="40">
+                                                    <TextBlock Text="{Binding Quantity}" 
+                                                               Foreground="#4CC2FF" 
+                                                               FontWeight="Bold" 
+                                                               FontSize="16"
+                                                               TextAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                </Border>
+
+                                                <Button Content="+" 
+                                                        Width="40" Height="40"
+                                                        FontSize="18" FontWeight="Bold"
+                                                        Background="#4CC2FF" Foreground="White"
+                                                        CornerRadius="0,4,4,0"
+                                                        HorizontalContentAlignment="Center"
+                                                        VerticalContentAlignment="Center"
+                                                        Padding="0"
+                                                        Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).IncrementQuantityCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                                
+                                                <!-- Remover (X) -->
+                                                <Button Content="✕" 
+                                                        Width="30" Height="40"
+                                                        Foreground="#FF6B6B" 
+                                                        Background="Transparent"
+                                                        FontSize="12"
+                                                        Margin="5,0,0,0"
+                                                        Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).RemoveFromCartCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
