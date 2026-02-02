@@ -22,7 +22,8 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PdvEspetinho");
+        // Use Personal folder which is guaranteed to be writable on Android/iOS
+        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PdvEspetinho");
 
         if (!Directory.Exists(folder))
             Directory.CreateDirectory(folder);

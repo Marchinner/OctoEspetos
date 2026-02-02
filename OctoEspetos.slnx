@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="OctoEspetos/OctoEspetos.csproj" />
+  <Project Path="OctoEspetos.Desktop/OctoEspetos.Desktop.csproj" />
+  <Project Path="OctoEspetos.Android/OctoEspetos.Android.csproj" />
 </Solution>

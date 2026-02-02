@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:OctoEspetos.ViewModels"
+             xmlns:m="using:OctoEspetos.Models"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
              x:DataType="vm:QuickOrderViewModel"
              x:Class="OctoEspetos.Views.QuickOrderView">
@@ -30,7 +31,7 @@
             </StackPanel>
         </Border>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, 420">
+        <Grid Grid.Row="1" ColumnDefinitions="*, 340">
             
             <!-- Área de Produtos -->
             <Grid Grid.Column="0" RowDefinitions="Auto, *">
@@ -43,11 +44,12 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <!-- Botão "Todos" -->
                         <Button Content="📋 TODOS"
-                                Command="{Binding $parent[UserControl].DataContext.SelectCategoryCommand}"
+                                Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).SelectCategoryCommand}"
                                 Background="{Binding SelectedCategory, Converter={x:Static ObjectConverters.IsNull}, ConverterParameter=#4CC2FF|#3E3E42}"
                                 Foreground="White"
                                 FontWeight="SemiBold"
-                                Padding="16,10"
+                                Padding="20,12"
+                                FontSize="16"
                                 CornerRadius="6"/>
                         
                         <!-- Categorias dinâmicas -->
@@ -58,14 +60,15 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="m:ProductCategory">
                                     <Button Content="{Binding Name}"
-                                            Command="{Binding $parent[UserControl].DataContext.SelectCategoryCommand}"
+                                            Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).SelectCategoryCommand}"
                                             CommandParameter="{Binding}"
                                             Background="#3E3E42"
                                             Foreground="White"
                                             FontWeight="SemiBold"
-                                            Padding="16,10"
+                                            Padding="20,12"
+                                            FontSize="16"
                                             CornerRadius="6"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -78,13 +81,13 @@
                     <ItemsControl ItemsSource="{Binding Products}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="5"/>
+                                <WrapPanel ItemWidth="190" ItemHeight="190" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button Margin="6" Padding="0"
-                                    Command="{Binding $parent[UserControl].DataContext.AddToCartCommand}"
+                        <DataTemplate x:DataType="m:Product">
+                            <Button Margin="5" Padding="0"
+                                    Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).AddToCartCommand}"
                                     CommandParameter="{Binding}"
                                     Background="#2D2D30" 
                                     CornerRadius="10"
@@ -113,7 +116,7 @@
                                                    TextWrapping="Wrap" 
                                                    TextTrimming="CharacterEllipsis"
                                                    MaxLines="2"
-                                                   FontSize="13" 
+                                                   FontSize="14" 
                                                    FontWeight="SemiBold"
                                                    Foreground="White"
                                                    HorizontalAlignment="Center" 
@@ -129,7 +132,7 @@
                                         <TextBlock Text="{Binding SellPrice, StringFormat='R$ {0:N2}'}" 
                                                    Foreground="#4CC2FF" 
                                                    FontWeight="Bold"
-                                                   FontSize="15"
+                                                   FontSize="16"
                                                    HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"/>
                                     </Border>
@@ -153,33 +156,35 @@
                     
                     <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent" Margin="10,0">
                         <ListBox.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="m:OrderItem">
                                 <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="0,4">
                                     <!-- Controle de Quantidade -->
                                     <Border Background="#2D2D30" CornerRadius="6" Padding="4,2">
                                         <StackPanel Orientation="Horizontal" Spacing="4">
                                             <Button Content="−" 
-                                                    Width="28" Height="28"
-                                                    FontSize="16" FontWeight="Bold"
+                                                    Width="48" Height="48"
+                                                    FontSize="20" FontWeight="Bold"
                                                     Background="#555" Foreground="White"
                                                     CornerRadius="4"
                                                     HorizontalContentAlignment="Center"
-                                                    Command="{Binding $parent[UserControl].DataContext.DecrementQuantityCommand}"
+                                                    VerticalContentAlignment="Center"
+                                                    Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).DecrementQuantityCommand}"
                                                     CommandParameter="{Binding}"/>
                                             <TextBlock Text="{Binding Quantity}" 
-                                                       Width="25"
+                                                       Width="30"
                                                        Foreground="#4CC2FF" 
                                                        FontWeight="Bold" 
-                                                       FontSize="15"
+                                                       FontSize="18"
                                                        TextAlignment="Center"
                                                        VerticalAlignment="Center"/>
                                             <Button Content="+" 
-                                                    Width="28" Height="28"
-                                                    FontSize="16" FontWeight="Bold"
+                                                    Width="48" Height="48"
+                                                    FontSize="20" FontWeight="Bold"
                                                     Background="#4CC2FF" Foreground="White"
                                                     CornerRadius="4"
                                                     HorizontalContentAlignment="Center"
-                                                    Command="{Binding $parent[UserControl].DataContext.IncrementQuantityCommand}"
+                                                    VerticalContentAlignment="Center"
+                                                    Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).IncrementQuantityCommand}"
                                                     CommandParameter="{Binding}"/>
                                         </StackPanel>
                                     </Border>
@@ -205,7 +210,7 @@
                                             Background="Transparent"
                                             FontSize="14"
                                             Margin="8,0,0,0"
-                                            Command="{Binding $parent[UserControl].DataContext.RemoveFromCartCommand}"
+                                            Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).RemoveFromCartCommand}"
                                             CommandParameter="{Binding}"/>
                                 </Grid>
                             </DataTemplate>

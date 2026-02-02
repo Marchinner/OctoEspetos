@@ -19,9 +19,19 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        using (var context = new AppDbContext())
+        try
         {
-            DataSeeder.SeedDatabase(context);
+            using (var context = new AppDbContext())
+            {
+                // Ensure database is created
+                context.Database.EnsureCreated();
+                DataSeeder.SeedDatabase(context);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"DB Init Error: {ex}");
+            // Optional: Show error dialog if possible, or just log for now
         }
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -32,6 +42,13 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel(),
+            };
+        }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            singleViewPlatform.MainView = new MainView
+            {
+                DataContext = new MainWindowViewModel()
             };
         }
 

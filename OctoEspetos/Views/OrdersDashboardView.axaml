@@ -5,6 +5,7 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:OctoEspetos.ViewModels"
+             xmlns:m="using:OctoEspetos.Models"
              d:DesignHeight="720"
              d:DesignWidth="1280"
              mc:Ignorable="d">
@@ -79,7 +80,7 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="m:Order">
                 <Border Margin="5"
                         Background="#3E3E42"
                         CornerRadius="5"
@@ -108,7 +109,7 @@
                               FontWeight="Bold"
                               HorizontalAlignment="Stretch"
                               Margin="0,0,3,0"
-                              Command="{Binding $parent[UserControl].DataContext.EditOrderCommand}"
+                              Command="{Binding $parent[UserControl].((vm:OrdersDashboardViewModel)DataContext).EditOrderCommand}"
                               CommandParameter="{Binding}" />
                       <Button Grid.Column="1"
                               Content="PAGAR"
@@ -117,7 +118,7 @@
                               FontWeight="Bold"
                               HorizontalAlignment="Stretch"
                               Margin="3,0,0,0"
-                              Command="{Binding $parent[UserControl].DataContext.PayOrderCommand}"
+                              Command="{Binding $parent[UserControl].((vm:OrdersDashboardViewModel)DataContext).PayOrderCommand}"
                               CommandParameter="{Binding}" />
                     </Grid>
                   </Grid>

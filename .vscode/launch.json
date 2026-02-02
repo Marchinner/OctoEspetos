@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (Desktop)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/OctoEspetos.Desktop/bin/Debug/net10.0/OctoEspetos.Desktop.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/OctoEspetos.Desktop",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Android: Run (No Debug)",
+            "type": "coreclr", // Placeholder, really just runs the task
+            "request": "launch",
+            "preLaunchTask": "Install and Run Android", // This handles the deployment
+            "program": "${workspaceFolder}/OctoEspetos.Desktop/bin/Debug/net10.0/OctoEspetos.Desktop.dll", // Dummy path to satisfy schema, or use "code" type if available
+            "modes": [
+                "debug"
+            ] // Hacky, usually better to just use Task. 
+        }
+    ]
+}
