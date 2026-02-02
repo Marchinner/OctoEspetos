@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OctoEspetos")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cfa3e1db8dba3be7cfb8560e8c0f9133343eae15")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa324a3ea62b156356ad7af24b2b989b26db8d33")]
 [assembly: System.Reflection.AssemblyProductAttribute("OctoEspetos")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OctoEspetos")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

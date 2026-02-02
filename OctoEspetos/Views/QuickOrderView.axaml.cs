@@ -21,8 +21,8 @@ public partial class QuickOrderView : UserControl
         switch (e.Key)
         {
             case Key.F2:
-                if (vm.CheckoutCommand.CanExecute(null))
-                    vm.CheckoutCommand.Execute(null);
+                if (vm.ShowPaymentModalCommand.CanExecute(null))
+                    vm.ShowPaymentModalCommand.Execute(null);
                 e.Handled = true;
                 break;
                 

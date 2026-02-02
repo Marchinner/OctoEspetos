@@ -16,7 +16,7 @@ public partial class QuickOrderViewModel : ViewModelBase
     private Client _selectedClient = new();
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CheckoutCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ShowPaymentModalCommand))]
     [NotifyCanExecuteChangedFor(nameof(SaveOpenOrderCommand))]
     private decimal _totalAmount;
 
@@ -35,6 +35,15 @@ public partial class QuickOrderViewModel : ViewModelBase
     [ObservableProperty]
     private ProductCategory? _selectedCategory;
 
+    [ObservableProperty]
+    private bool _isPaymentModalVisible;
+
+    [ObservableProperty]
+    private decimal _amountReceived;
+
+    [ObservableProperty]
+    private decimal _changeAmount;
+
     private ObservableCollection<Product> _allProducts = [];
 
     public ObservableCollection<Product> Products { get; } = [];
@@ -52,6 +61,11 @@ public partial class QuickOrderViewModel : ViewModelBase
     ];
 
     public Action? OnFinished { get; set; }
+
+    partial void OnAmountReceivedChanged(decimal value)
+    {
+        ChangeAmount = value - TotalAmount;
+    }
 
     public QuickOrderViewModel()
     {
@@ -286,8 +300,27 @@ public partial class QuickOrderViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task CheckoutAsync()
+    private void ShowPaymentModal()
     {
+        if (TotalAmount <= 0) return;
+        
+        AmountReceived = 0;
+        ChangeAmount = 0;
+        IsPaymentModalVisible = true;
+    }
+
+    [RelayCommand]
+    private void CancelPayment()
+    {
+        IsPaymentModalVisible = false;
+        AmountReceived = 0;
+        ChangeAmount = 0;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmPaymentAsync()
+    {
+        IsPaymentModalVisible = false;
         StatusMessage = "Processando...";
 
         using var db = new AppDbContext();
@@ -363,6 +396,8 @@ public partial class QuickOrderViewModel : ViewModelBase
             ClientName = "Consumidor Final";
             EditingOrderId = null;
             SelectedPaymentMethod = "Dinheiro";
+            AmountReceived = 0;
+            ChangeAmount = 0;
 
             await Task.Delay(1000);
             OnFinished?.Invoke();
