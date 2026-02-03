@@ -29,18 +29,18 @@
                 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
                     <TextBlock Text="🍢" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <TextBlock Text="OCTO ESPETOS" FontWeight="Bold" FontSize="18" VerticalAlignment="Center" Foreground="#4CC2FF"/>
+                    <TextBlock x:Name="TitleText" Text="OCTO ESPETOS" FontWeight="Bold" FontSize="18" VerticalAlignment="Center" Foreground="#4CC2FF"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                     
-                    <Button Classes="NavBtn" Content="Novo Pedido" 
+                    <Button x:Name="BtnOrder" Classes="NavBtn" Content="Novo Pedido" 
                             Command="{Binding GoToOrderCommand}"/>
                     
-                    <Button Classes="NavBtn" Content="Dashboard / Histórico" 
+                    <Button x:Name="BtnDash" Classes="NavBtn" Content="Dashboard / Histórico" 
                             Command="{Binding NavigateToDashboardCommand}"/>
                     
-                    <Button Classes="NavBtn" Content="Inventário" 
+                    <Button x:Name="BtnInv" Classes="NavBtn" Content="Inventário" 
                             Command="{Binding NavigateToInventoryCommand}"/> </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">

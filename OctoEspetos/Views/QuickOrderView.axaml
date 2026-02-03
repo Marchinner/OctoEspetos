@@ -225,12 +225,12 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <StackPanel Grid.Row="2" Background="#252526" Spacing="12" Margin="15">
+                    <StackPanel Grid.Row="2" Background="#252526" Spacing="6" Margin="10">
                         <!-- Total -->
                         <Grid ColumnDefinitions="*, Auto">
-                            <TextBlock Text="TOTAL" FontSize="18" Foreground="#AAA" VerticalAlignment="Center"/>
+                            <TextBlock Text="TOTAL" FontSize="16" Foreground="#AAA" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='R$ {0:N2}'}" 
-                                       FontSize="32" FontWeight="Bold" Foreground="#4CC2FF"/>
+                                       FontSize="28" FontWeight="Bold" Foreground="#4CC2FF"/>
                         </Grid>
                         
                         <!-- Método de Pagamento -->
@@ -244,28 +244,32 @@
                                       SelectedItem="{Binding SelectedPaymentMethod}"
                                       HorizontalAlignment="Stretch"
                                       Background="#333"
+                                      MinHeight="35"
+                                      Padding="10,5"
                                       Foreground="White"
                                       CornerRadius="6"/>
                         </Grid>
                         
-                        <!-- Botões empilhados -->
-                        <StackPanel Spacing="8">
-                            <Button Content="💾  DEIXAR EM ABERTO (F3)" 
+                        <!-- Botões lado a lado -->
+                        <Grid ColumnDefinitions="*, 8, *">
+                            <Button Grid.Column="0"
+                                    Content="💾 SALVAR (F3)" 
                                     Command="{Binding SaveOpenOrderCommand}"
                                     Background="#FF8C00" Foreground="White" 
-                                    FontSize="15" FontWeight="Bold"
+                                    FontSize="13" FontWeight="Bold"
                                     HorizontalAlignment="Stretch" 
                                     HorizontalContentAlignment="Center"
-                                    Height="50" CornerRadius="8"/>
+                                    Height="45" CornerRadius="8"/>
                             
-                            <Button Content="💰  PAGAR / FINALIZAR (F2)" 
+                            <Button Grid.Column="2"
+                                    Content="💰 PAGAR (F2)" 
                                     Command="{Binding ShowPaymentModalCommand}"
                                     Background="#28A745" Foreground="White" 
-                                    FontSize="15" FontWeight="Bold"
+                                    FontSize="13" FontWeight="Bold"
                                     HorizontalAlignment="Stretch" 
                                     HorizontalContentAlignment="Center"
-                                    Height="50" CornerRadius="8"/>
-                        </StackPanel>
+                                    Height="45" CornerRadius="8"/>
+                        </Grid>
                     </StackPanel>
                 </Grid>
             </Border>
