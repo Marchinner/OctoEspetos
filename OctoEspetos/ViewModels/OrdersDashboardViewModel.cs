@@ -16,12 +16,44 @@ public partial class OrdersDashboardViewModel : ViewModelBase
     public ObservableCollection<Order> OpenOrders { get; } = new();
     public ObservableCollection<Order> FinishedOrders { get; } = new();
 
+    public ObservableCollection<string> PaymentMethods { get; } = 
+    [
+        "Dinheiro",
+        "PIX",
+        "Cartão Débito",
+        "Cartão Crédito"
+    ];
+
     // --- PROPERTIES ---
     [ObservableProperty]
     private decimal _totalRevenueToday;
 
     [ObservableProperty]
     private DateTimeOffset _selectedDate;
+
+    // Modal Properties
+    [ObservableProperty]
+    private bool _isPaymentModalVisible;
+
+    [ObservableProperty]
+    private Order? _selectedPaymentOrder;
+
+    [ObservableProperty]
+    private string _selectedPaymentMethod = "Dinheiro";
+
+    [ObservableProperty]
+    private decimal _amountReceived;
+
+    [ObservableProperty]
+    private decimal _changeAmount;
+
+    partial void OnAmountReceivedChanged(decimal value)
+    {
+        if (SelectedPaymentOrder != null)
+        {
+            ChangeAmount = value - SelectedPaymentOrder.TotalAmount;
+        }
+    }
 
     // Navigation back to POS
     public Action? RequestGoBack { get; set; }
@@ -85,14 +117,35 @@ public partial class OrdersDashboardViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task PayOrderAsync(Order order)
+    public void PayOrder(Order order)
     {
+        SelectedPaymentOrder = order;
+        SelectedPaymentMethod = "Dinheiro";
+        AmountReceived = 0;
+        ChangeAmount = 0;
+        IsPaymentModalVisible = true;
+    }
+
+    [RelayCommand]
+    public void CancelPayment()
+    {
+        IsPaymentModalVisible = false;
+        SelectedPaymentOrder = null;
+    }
+
+    [RelayCommand]
+    public async Task ConfirmPaymentAsync()
+    {
+        if (SelectedPaymentOrder == null) return;
+
+        IsPaymentModalVisible = false;
+
         using var db = new AppDbContext();
         using var transaction = await db.Database.BeginTransactionAsync();
 
         try
         {
-            var dbOrder = await db.Orders.FindAsync(order.Id);
+            var dbOrder = await db.Orders.FindAsync(SelectedPaymentOrder.Id);
             if (dbOrder == null) return;
 
             dbOrder.IsPaid = true;
@@ -100,9 +153,9 @@ public partial class OrdersDashboardViewModel : ViewModelBase
             // Registrar pagamento
             var payment = new Payment
             {
-                OrderId = order.Id,
-                Amount = order.TotalAmount,
-                PaymentMethod = "Dinheiro",
+                OrderId = SelectedPaymentOrder.Id,
+                Amount = SelectedPaymentOrder.TotalAmount,
+                PaymentMethod = SelectedPaymentMethod,
                 PaidAt = DateTime.Now
             };
             db.Payments.Add(payment);
@@ -116,6 +169,10 @@ public partial class OrdersDashboardViewModel : ViewModelBase
         catch
         {
             await transaction.RollbackAsync();
+        }
+        finally
+        {
+            SelectedPaymentOrder = null;
         }
     }
 }

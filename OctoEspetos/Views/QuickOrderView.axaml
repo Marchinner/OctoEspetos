@@ -331,7 +331,7 @@
                 </Grid>
                 
                 <!-- Valor Recebido (apenas para Dinheiro) -->
-                <StackPanel Spacing="10" IsVisible="{Binding SelectedPaymentMethod, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <StackPanel Spacing="10" IsVisible="{Binding SelectedPaymentMethod, Converter={x:Static ObjectConverters.Equal}, ConverterParameter='Dinheiro'}">
                     <Grid ColumnDefinitions="Auto, *">
                         <TextBlock Text="Recebido:" Foreground="#AAA" VerticalAlignment="Center" Margin="0,0,15,0"/>
                         <TextBox Grid.Column="1"
