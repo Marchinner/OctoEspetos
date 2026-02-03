@@ -44,6 +44,18 @@ public partial class QuickOrderViewModel : ViewModelBase
     [ObservableProperty]
     private decimal _changeAmount;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CartToggleIcon))]
+    private bool _isCartExpanded = false;
+
+    public string CartToggleIcon => IsCartExpanded ? "▼" : "▲";
+
+    [RelayCommand]
+    private void ToggleCart()
+    {
+        IsCartExpanded = !IsCartExpanded;
+    }
+
     private ObservableCollection<Product> _allProducts = [];
 
     public ObservableCollection<Product> Products { get; } = [];
@@ -103,9 +115,20 @@ public partial class QuickOrderViewModel : ViewModelBase
         using var db = new AppDbContext();
         
         // Carregar categorias
+        // Carregar categorias e converter para Emojis
         var categories = db.Categories.ToList();
         Categories.Clear();
-        foreach (var c in categories) Categories.Add(c);
+        foreach (var c in categories) 
+        {
+            // Mapeamento simples para emojis
+            if (c.Name.Contains("Espetinho", StringComparison.OrdinalIgnoreCase)) c.Name = "🍢";
+            else if (c.Name.Contains("Bebida", StringComparison.OrdinalIgnoreCase)) c.Name = "🥤";
+            else if (c.Name.Contains("Porção", StringComparison.OrdinalIgnoreCase) || c.Name.Contains("Porcao", StringComparison.OrdinalIgnoreCase)) c.Name = "🍟";
+            else if (c.Name.Contains("Sobremesa", StringComparison.OrdinalIgnoreCase)) c.Name = "🍦";
+            else if (c.Name.Contains("Outros", StringComparison.OrdinalIgnoreCase)) c.Name = "➕";
+            
+            Categories.Add(c);
+        }
 
         // Carregar produtos
         var all = db.Products

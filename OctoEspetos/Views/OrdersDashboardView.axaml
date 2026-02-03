@@ -14,17 +14,22 @@
   </Design.DataContext>
   <Grid RowDefinitions="Auto, *">
     <Border Background="#252526" Padding="15" Grid.Row="0">
-      <Grid ColumnDefinitions="Auto, *, Auto, Auto">
-        <Button Content="⬅ VOLTAR AO PDV"
+      <Grid x:Name="HeaderGrid" RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *, Auto, Auto">
+        <Button Content="⬅"
                 Command="{Binding GoBackCommand}"
                 Background="Transparent"
-                BorderBrush="Gray"
-                BorderThickness="1"
-                Grid.Column="0" />
-        <StackPanel VerticalAlignment="Center"
+                Foreground="White"
+                FontSize="32"
+                Padding="15,5"
+                BorderThickness="0"
+                Grid.Column="0" Grid.Row="0"/>
+        
+        <StackPanel x:Name="RevenuePanel" 
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="10"
-                    Grid.Column="2">
+                    Grid.Column="2" Grid.Row="0">
           <TextBlock VerticalAlignment="Center"
                      Foreground="#AAA"
                      Text="FATURAMENTO TOTAL:" />
@@ -33,37 +38,45 @@
                      Foreground="#4CC2FF"
                      Text="{Binding TotalRevenueToday, StringFormat='R$ {0:N2}'}" />
         </StackPanel>
-        <Button Content="⟳ Atualizar"
+        
+        <Button Content="⟳"
                 Command="{Binding LoadDataCommand}"
+                Background="Transparent"
+                Foreground="#4CC2FF"
+                FontSize="32"
+                Padding="15,5"
+                BorderThickness="0"
                 Margin="10,0,0,0"
-                Grid.Column="3" />
+                Grid.Column="3" Grid.Row="0"/>
       </Grid>
     </Border>
     <TabControl Margin="10" Grid.Row="1">
-      <TabItem Header="HISTÓRICO DE VENDAS">
+      <TabItem Header="HISTÓRICO DE VENDAS" FontSize="16" FontWeight="SemiBold">
         <Grid RowDefinitions="Auto, *">
           <StackPanel Margin="0,0,0,10"
                       Orientation="Horizontal"
                       Spacing="10">
-            <TextBlock VerticalAlignment="Center" Text="Date:" />
+            <TextBlock VerticalAlignment="Center" Text="Data:" FontSize="16"/>
             <DatePicker SelectedDate="{Binding SelectedDate}" />
-            <Button Content="Filtrar" Command="{Binding LoadDataCommand}" />
+            <Button Content="Filtrar" Command="{Binding LoadDataCommand}" FontSize="16"/>
           </StackPanel>
           <DataGrid AutoGenerateColumns="False"
                     Background="#2D2D30"
                     GridLinesVisibility="Horizontal"
                     IsReadOnly="True"
+                    RowHeight="50"
+                    FontSize="16"
                     ItemsSource="{Binding FinishedOrders}"
                     Grid.Row="1">
             <DataGrid.Columns>
-              <DataGridTextColumn Width="60" Binding="{Binding Id}" Header="#" />
-              <DataGridTextColumn Width="80"
+              <DataGridTextColumn Width="80" Binding="{Binding Id}" Header="#" />
+              <DataGridTextColumn Width="100"
                                   Binding="{Binding CreatedAt, StringFormat='HH:mm'}"
                                   Header="Hora" />
               <DataGridTextColumn Width="*"
                                   Binding="{Binding Client.Name}"
                                   Header="Cliente" />
-              <DataGridTextColumn Width="100"
+              <DataGridTextColumn Width="140"
                                   Binding="{Binding TotalAmount, StringFormat='R$ {0:N2}'}"
                                   FontWeight="Bold"
                                   Header="Total" />
@@ -71,12 +84,12 @@
           </DataGrid>
         </Grid>
       </TabItem>
-      <TabItem Header="PEDIDOS ABERTOS / MESAS">
+      <TabItem Header="PEDIDOS ABERTOS" FontSize="16" FontWeight="SemiBold">
         <ScrollViewer>
           <ItemsControl ItemsSource="{Binding OpenOrders}">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
-                <WrapPanel ItemHeight="150" ItemWidth="220" />
+                <WrapPanel x:Name="OpenOrdersWrapPanel" ItemHeight="210" ItemWidth="220" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
@@ -84,31 +97,35 @@
                 <Border Margin="5"
                         Background="#3E3E42"
                         CornerRadius="5"
-                        Padding="10">
+                        Padding="15">
                   <Grid RowDefinitions="Auto, *, Auto, Auto">
-                    <TextBlock FontSize="16"
+                    <TextBlock FontSize="18"
                                FontWeight="Bold"
                                Text="{Binding Client.Name, TargetNullValue='Walk-in'}" />
                     <StackPanel Grid.Row="1" Margin="0,5">
                       <TextBlock Foreground="#AAA"
                                  Text="{Binding Id, StringFormat='Pedido #{0}'}" />
-                      <TextBlock Foreground="#888" FontSize="12"
+                      <TextBlock Foreground="#888" FontSize="14"
                                  Text="{Binding CreatedAt, StringFormat='Aberto: {0:HH:mm}'}" />
                     </StackPanel>
                     <TextBlock Grid.Row="2"
                                Margin="0,5"
-                               FontSize="20"
+                               FontSize="24"
                                FontWeight="Bold"
                                Foreground="#4CC2FF"
                                Text="{Binding TotalAmount, StringFormat='R$ {0:N2}'}" />
-                    <Grid Grid.Row="3" ColumnDefinitions="*, *">
+                    <Grid Grid.Row="3" ColumnDefinitions="*, *" Margin="0,10,0,0">
                       <Button Grid.Column="0"
                               Content="EDITAR"
                               Background="#007ACC"
                               Foreground="White"
                               FontWeight="Bold"
+                              FontSize="14"
+                              Height="40"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center"
                               HorizontalAlignment="Stretch"
-                              Margin="0,0,3,0"
+                              Margin="0,0,5,0"
                               Command="{Binding $parent[UserControl].((vm:OrdersDashboardViewModel)DataContext).EditOrderCommand}"
                               CommandParameter="{Binding}" />
                       <Button Grid.Column="1"
@@ -116,8 +133,12 @@
                               Background="#28a745"
                               Foreground="White"
                               FontWeight="Bold"
+                              FontSize="14"
+                              Height="40"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center"
                               HorizontalAlignment="Stretch"
-                              Margin="3,0,0,0"
+                              Margin="5,0,0,0"
                               Command="{Binding $parent[UserControl].((vm:OrdersDashboardViewModel)DataContext).PayOrderCommand}"
                               CommandParameter="{Binding}" />
                     </Grid>

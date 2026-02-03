@@ -19,7 +19,7 @@
                 <TextBlock Text="Cliente:" VerticalAlignment="Center" Foreground="#AAA" FontSize="18"/>
                 
                 <TextBox Text="{Binding ClientName}" 
-                         Width="300"
+                         Width="200"
                          FontWeight="Bold" FontSize="18"
                          Background="#333" Foreground="White"
                          BorderThickness="0" Padding="10,8"
@@ -43,13 +43,13 @@
                               Margin="15,10,15,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <!-- Botão "Todos" -->
-                        <Button Content="📋 TODOS"
+                        <Button Content="📋"
                                 Command="{Binding $parent[UserControl].((vm:QuickOrderViewModel)DataContext).SelectCategoryCommand}"
                                 Background="{Binding SelectedCategory, Converter={x:Static ObjectConverters.IsNull}, ConverterParameter=#4CC2FF|#3E3E42}"
                                 Foreground="White"
                                 FontWeight="SemiBold"
-                                Padding="20,12"
-                                FontSize="16"
+                                Padding="15,10"
+                                FontSize="24"
                                 CornerRadius="6"/>
                         
                         <!-- Categorias dinâmicas -->
@@ -67,8 +67,8 @@
                                             Background="#3E3E42"
                                             Foreground="White"
                                             FontWeight="SemiBold"
-                                            Padding="20,12"
-                                            FontSize="16"
+                                            Padding="15,10"
+                                            FontSize="24"
                                             CornerRadius="6"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -147,14 +147,27 @@
             <!-- Painel do Pedido -->
             <Border x:Name="CartArea" Grid.Column="1" Background="#1E1E1E" BorderBrush="#333" BorderThickness="1,0,0,0">
                 <Grid RowDefinitions="Auto, *, Auto">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="PEDIDO" Foreground="#AAA" FontWeight="SemiBold" FontSize="14"/>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Button Background="Transparent" 
+                                Width="60" Height="60"
+                                Command="{Binding ToggleCartCommand}"
+                                VerticalContentAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="{Binding CartToggleIcon}" 
+                                       FontSize="28" Foreground="#AAA" FontWeight="Bold"/>
+                        </Button>
+                        <TextBlock Text="PEDIDO" Foreground="#AAA" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding EditingOrderId, StringFormat=' #{0}'}" 
                                    Foreground="#FFA500" FontWeight="SemiBold"
-                                   IsVisible="{Binding EditingOrderId, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                   IsVisible="{Binding EditingOrderId, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
                     
-                    <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent" Margin="5,0">
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Cart}" Background="Transparent" Margin="5,0"
+                             Padding="0,0,0,60"
+                             IsVisible="{Binding IsCartExpanded}"
+                             ScrollViewer.VerticalScrollBarVisibility="Visible">
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="m:OrderItem">
                                 <Border Background="#2D2D30" CornerRadius="6" Padding="8" Margin="0,4">
@@ -233,22 +246,7 @@
                                        FontSize="28" FontWeight="Bold" Foreground="#4CC2FF"/>
                         </Grid>
                         
-                        <!-- Método de Pagamento -->
-                        <Grid ColumnDefinitions="Auto, *">
-                            <TextBlock Text="Pagamento:" 
-                                       Foreground="#AAA" 
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,10,0"/>
-                            <ComboBox Grid.Column="1"
-                                      ItemsSource="{Binding PaymentMethods}"
-                                      SelectedItem="{Binding SelectedPaymentMethod}"
-                                      HorizontalAlignment="Stretch"
-                                      Background="#333"
-                                      MinHeight="35"
-                                      Padding="10,5"
-                                      Foreground="White"
-                                      CornerRadius="6"/>
-                        </Grid>
+
                         
                         <!-- Botões lado a lado -->
                         <Grid ColumnDefinitions="*, 8, *">
@@ -259,6 +257,7 @@
                                     FontSize="13" FontWeight="Bold"
                                     HorizontalAlignment="Stretch" 
                                     HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Height="45" CornerRadius="8"/>
                             
                             <Button Grid.Column="2"
@@ -268,6 +267,7 @@
                                     FontSize="13" FontWeight="Bold"
                                     HorizontalAlignment="Stretch" 
                                     HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Height="45" CornerRadius="8"/>
                         </Grid>
                     </StackPanel>
@@ -283,12 +283,14 @@
             VerticalAlignment="Stretch">
         <Border Background="#2D2D30" 
                 CornerRadius="12"
-                Padding="30"
+                Padding="20"
                 Width="450"
+                MaxHeight="550"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 BoxShadow="0 8 32 0 #40000000">
-            <StackPanel Spacing="20">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="15">
                 
                 <!-- Header -->
                 <TextBlock Text="CONFIRMAR PAGAMENTO" 
@@ -368,6 +370,7 @@
                             Height="50" CornerRadius="8"/>
                 </Grid>
             </StackPanel>
+            </ScrollViewer>
         </Border>
     </Border>
     </Panel>

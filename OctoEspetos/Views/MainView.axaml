@@ -35,12 +35,15 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                     
                     <Button x:Name="BtnOrder" Classes="NavBtn" Content="Novo Pedido" 
+                            Padding="10,8" FontSize="15"
                             Command="{Binding GoToOrderCommand}"/>
                     
-                    <Button x:Name="BtnDash" Classes="NavBtn" Content="Dashboard / Histórico" 
+                    <Button x:Name="BtnDash" Classes="NavBtn" Content="Dashboard" 
+                            Padding="10,8" FontSize="15"
                             Command="{Binding NavigateToDashboardCommand}"/>
                     
                     <Button x:Name="BtnInv" Classes="NavBtn" Content="Inventário" 
+                            Padding="10,8" FontSize="15"
                             Command="{Binding NavigateToInventoryCommand}"/> </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
